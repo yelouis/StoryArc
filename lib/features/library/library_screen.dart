@@ -41,6 +41,13 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
         title: const Text("Your Plotlines"),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.mic, color: CosmicTheme.accentSoftCyan),
+            onPressed: () => GoRouter.of(context).push('/live-session'),
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),

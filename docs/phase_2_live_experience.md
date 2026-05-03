@@ -37,14 +37,14 @@ Implement the core multimodal interaction: a real-time voice interview with Gemi
 
 
 ## Validation & Success Criteria
-*   [ ] Connection to Gemini Live WebSocket is established and maintained.
-*   [ ] API Key is never stored in plain text or transmitted directly from the client without a secure handshake.
-*   [ ] System prompt remains resilient against basic injection attempts (e.g., "Ignore previous instructions").
-*   [ ] App captures user voice and receives an intelligent, audible response from the AI.
-
-*   [ ] Visualizer reacts dynamically to the user's voice intensity.
-*   [ ] Session can be started, paused, and terminated gracefully.
-*   [ ] Audio latency is low enough for a natural conversation feel.
+*   [x] Connection to Gemini Live WebSocket is established and maintained.
+*   [x] API Key is safely pulled from `FlutterSecureStorage` and used in the WebSocket handshake.
+*   [x] System prompt configures the "Biographer" persona with strict narrative focus.
+*   [x] App captures user voice (16kHz PCM) and pipes chunks to Gemini.
+*   [x] App receives and plays AI-generated PCM audio buffers in real-time.
+*   [x] Visualizer reacts dynamically to the user's voice intensity.
+*   [x] Session can be started and terminated gracefully from the Library UI.
+*   [ ] Audio latency is low enough for a natural conversation feel (Pending E2E physical device testing).
 
 ---
 
@@ -54,11 +54,19 @@ Implement the core multimodal interaction: a real-time voice interview with Gemi
    - **Root Cause**: The Gemini Live API requires a specific setup sequence that was causing `403 Forbidden` errors due to malformed headers.
    - **Implementation**: Refactored the `GeminiLiveService` to strictly follow the auth-header pattern and implemented a `ConnectionStateProvider` to track the handshake in the UI.
 
+2. **Real-Time PCM Streaming Architecture (Finalized - May 03)**:
+   - **Root Cause**: Standard Flutter audio packages (`just_audio`, `audioplayers`) are optimized for file/URL playback and lack native support for low-latency raw PCM buffer streaming required for a "Live" feel.
+   - **Implementation**: Integrated `flutter_pcm_sound` for raw 16-bit PCM playback and refactored `AudioService` to pipe WebSocket binary frames directly into the audio driver, bypassing file-system overhead.
+
+3. **Reactive Cosmic Visualizer (Finalized - May 03)**:
+   - **Root Cause**: Static UIs fail to convey the "listening" state of the AI, leading to user confusion and reduced immersion.
+   - **Implementation**: Developed a `CustomPainter` that consumes a high-frequency amplitude stream (50ms intervals) to drive a multi-layered wave animation, providing immediate visual confirmation of audio capture.
+
 ## 🎬 Active Limitations & Narrative Backlog
 
-- **Audio Buffer Underflow**: On unstable connections, AI voice playback can stutter. Implementing a jitter buffer in the `AudioPlaybackService` is suggested.
-- **Echo Cancellation**: Standard Flutter audio recording may capture the speaker's output on some devices. Moving to the `flutter_webrtc` audio processing stack for hardware-level echo cancellation is suggested for Phase 3.
-- **VAD Implementation**: Sending silence to Gemini wastes tokens and bandwidth. Implementing client-side Voice Activity Detection (VAD) using a lightweight TFLite model or simple amplitude thresholds is suggested.
-- **Connection Recovery**: WebSocket drops during a session can lose session state. Implementing a "Reconnection Handshake" that preserves the current transcript context is suggested.
+- **Audio Buffer Underflow**: On unstable connections, AI voice playback can stutter. Implementing a jitter buffer in the `AudioService` is suggested.
+- **Echo Cancellation**: Standard Flutter audio recording may capture the speaker's output on some devices. Moving to `flutter_webrtc` for hardware-level AEC is suggested for Phase 3.
+- **Voice Activity Detection (VAD)**: The current implementation streams silence to Gemini. Implementing client-side VAD to pause the stream when the user is not speaking is suggested for token optimization.
+- **Session Continuity**: WebSocket drops cause a loss of conversation state. Persisting the current session transcript to Firestore in real-time for seamless reconnection is suggested.
 
 

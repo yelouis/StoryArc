@@ -6,6 +6,7 @@ import 'features/library/add_plotline_screen.dart';
 import 'features/library/manual_entry_screen.dart';
 import 'features/onboarding/connection_studio.dart';
 import 'features/onboarding/onboarding_prologue.dart';
+import 'features/live_session/live_interview_screen.dart';
 import 'core/config_provider.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -45,6 +46,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/manual-entry',
         builder: (context, state) => const ManualEntryScreen(),
+      ),
+      GoRoute(
+        path: '/live-session',
+        builder: (context, state) => const LiveInterviewScreen(),
       ),
     ],
   );
