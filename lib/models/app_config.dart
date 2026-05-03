@@ -24,4 +24,22 @@ class AppConfig {
       useUserApiKey: useUserApiKey ?? this.useUserApiKey,
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'geminiApiKey': geminiApiKey,
+      'personaPrompt': personaPrompt,
+      'isHapticFeedbackEnabled': isHapticFeedbackEnabled,
+      'useUserApiKey': useUserApiKey,
+    };
+  }
+
+  factory AppConfig.fromMap(Map<String, dynamic> map) {
+    return AppConfig(
+      geminiApiKey: map['geminiApiKey'],
+      personaPrompt: map['personaPrompt'] ?? "You are a cinematic story architect...",
+      isHapticFeedbackEnabled: map['isHapticFeedbackEnabled'] ?? true,
+      useUserApiKey: map['useUserApiKey'] ?? false,
+    );
+  }
 }

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:go_router/go_router.dart';
 import '../../core/theme.dart';
+import '../../core/config_provider.dart';
+import '../../core/widgets/arc_widgets.dart';
 
 class ConnectionStudioScreen extends ConsumerStatefulWidget {
   const ConnectionStudioScreen({super.key});
@@ -13,6 +16,49 @@ class ConnectionStudioScreen extends ConsumerStatefulWidget {
 class _ConnectionStudioScreenState extends ConsumerState<ConnectionStudioScreen> {
   final _apiKeyController = TextEditingController();
   bool _isObscured = true;
+  bool _isValidating = false;
+
+  @override
+  void dispose() {
+    _apiKeyController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _handleTestConnection() async {
+    final key = _apiKeyController.text.trim();
+    if (key.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please enter an API key"),
+          backgroundColor: Colors.redAccent,
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isValidating = true);
+
+    // Mock validation logic
+    await Future.delayed(const Duration(seconds: 1));
+
+    if (key.startsWith("AIza")) {
+      await ref.read(configProvider.notifier).setApiKey(key);
+      if (mounted) {
+        context.go('/');
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Invalid API key format. Should start with 'AIza'."),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
+    }
+
+    setState(() => _isValidating = false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,37 +91,24 @@ class _ConnectionStudioScreenState extends ConsumerState<ConnectionStudioScreen>
                   style: Theme.of(context).textTheme.bodyLarge,
                 ).animate().fadeIn(delay: 200.ms, duration: 800.ms),
                 const Spacer(),
-                TextField(
+                ArcTextField(
                   controller: _apiKeyController,
+                  label: "Gemini API Key",
+                  hint: "Enter your API key...",
                   obscureText: _isObscured,
-                  decoration: InputDecoration(
-                    labelText: "Gemini API Key",
-                    hintText: "Enter your API key...",
-                    filled: true,
-                    fillColor: CosmicTheme.glassWhite,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _isObscured ? Icons.visibility_off : Icons.visibility,
+                      color: Colors.white70,
                     ),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _isObscured ? Icons.visibility_off : Icons.visibility,
-                        color: Colors.white70,
-                      ),
-                      onPressed: () => setState(() => _isObscured = !_isObscured),
-                    ),
+                    onPressed: () => setState(() => _isObscured = !_isObscured),
                   ),
                 ).animate().fadeIn(delay: 400.ms).scale(begin: const Offset(0.95, 0.95)),
                 const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // TODO: Implement validation logic
-                    },
-                    child: const Text("Test Connection"),
-                  ),
+                ArcButton(
+                  text: "Test Connection",
+                  onPressed: _handleTestConnection,
+                  isLoading: _isValidating,
                 ).animate().fadeIn(delay: 600.ms),
                 const SizedBox(height: 40),
               ],

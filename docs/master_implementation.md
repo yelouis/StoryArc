@@ -31,7 +31,7 @@ The objective is to move from "log-based" journaling to "story-based" reflection
 
 ## Implementation Phases
 
-### [Phase 0: The Project North Star & Foundation](file:///Users/louisye/Desktop/Louis/StoryArc/docs/phase_0_foundation.md)
+### [Phase 0: The Project North Star & Foundation](file:///Users/louisye/Desktop/Louis/StoryArc/docs/phase_0_foundation.md) [COMPLETE]
 **Goal:** Establish the Flutter environment, theme, and core data models. Focus on the architectural "spine" of the app.
 
 ### [Phase 1: The Narrative Core (Library & Basic Input)](file:///Users/louisye/Desktop/Louis/StoryArc/docs/phase_1_narrative_core.md)
@@ -61,6 +61,10 @@ The objective is to move from "log-based" journaling to "story-based" reflection
 1. **Flutter/Dart Strategy (Finalized - May 03)**:
    - **Root Cause**: The project required a highly interactive UI with low-latency audio—traditionally difficult in cross-platform frameworks.
    - **Implementation**: Selected Flutter for its superior `CustomPainter` performance and FFI (Foreign Function Interface) capabilities, which will be essential for Phase 2 audio streaming.
+
+2. **Secure Onboarding & Component Architecture (Finalized - May 03)**:
+   - **Root Cause**: Handling user-provided API keys required a secure, persistent, and reactive solution, while the UI needed a premium, reusable design system.
+   - **Implementation**: Implemented a cinematic "Prologue" and "Connection Studio" flow utilizing `flutter_secure_storage` and a suite of frosted-glass `ArcWidgets` to ensure both security and a high-end aesthetic from the first launch.
 
 ## 🎬 Active Limitations & Narrative Backlog
 

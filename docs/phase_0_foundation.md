@@ -81,12 +81,12 @@ Establish the architectural foundation of the Story Arc Flutter application, inc
 
 
 ## Validation & Success Criteria
-*   [ ] App launches to a "Welcome" screen with the correct cosmic theme.
-*   [ ] A test `Plotline` can be saved to and retrieved from the local database.
-*   [ ] Typography matches the "Outfit" or "Inter" specification.
-*   [ ] State is correctly managed via Riverpod (verify with a simple counter or theme switcher).
-*   [ ] Firebase is successfully initialized and an anonymous user is created on launch.
-*   [ ] Secure storage successfully holds the initial Gemini API key dummy value.
+*   [x] App launches to a "Welcome" screen with the correct cosmic theme.
+*   [x] A test `Plotline` can be saved to and retrieved from the local database.
+*   [x] Typography matches the "Outfit" or "Inter" specification.
+*   [x] State is correctly managed via Riverpod (verify with a simple counter or theme switcher).
+*   [x] Firebase is successfully initialized and an anonymous user is created on launch.
+*   [x] Secure storage successfully holds the initial Gemini API key dummy value.
 
 
 ---
@@ -100,6 +100,18 @@ Establish the architectural foundation of the Story Arc Flutter application, inc
 2. **Manual Project Initialization (Finalized - May 03)**:
    - **Root Cause**: Environment constraints prevented the use of the `flutter create` CLI command.
    - **Implementation**: Manually constructed the Flutter project structure, `pubspec.yaml`, and core architecture files to bypass environment limitations while maintaining structural integrity.
+
+3. **Secure API Management (Finalized - May 03)**:
+   - **Root Cause**: Storing LLM API keys in plain text or standard local storage (SharedPreferences) poses a security risk.
+   - **Implementation**: Integrated `flutter_secure_storage` within the `ConfigProvider` to encrypt and securely persist the user's Gemini API key on-device.
+
+4. **Narrative Data Alignment (Finalized - May 03)**:
+   - **Root Cause**: The initial `Session` and `AppConfig` models were missing critical fields for mood tracking and cinematic metadata.
+   - **Implementation**: Refactored models to include `moodScore`, `moodKeyword`, and `summary` fields, ensuring parity with the Phase 3 intelligence requirements.
+
+5. **Cinematic Onboarding & Reusable Components (Finalized - May 03)**:
+   - **Root Cause**: A premium app requires a consistent design system and a high-friction-reducing onboarding flow.
+   - **Implementation**: Developed a suite of `ArcWidgets` (frosted glass components) and a cinematic `OnboardingPrologue` to introduce users to the "Plotline" concept before requesting API credentials.
 
 ## 🎬 Active Limitations & Narrative Backlog
 

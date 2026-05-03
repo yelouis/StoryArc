@@ -6,7 +6,15 @@ import 'core/router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp(); // Uncomment when firebase is configured
+  
+  // NOTE: Firebase initialization requires firebase_options.dart
+  // try {
+  //   await Firebase.initializeApp();
+  //   FirebaseFirestore.instance.settings = const Settings(persistenceEnabled: true);
+  // } catch (e) {
+  //   debugPrint("Firebase initialization failed: $e");
+  // }
+
   runApp(const ProviderScope(child: StoryArcApp()));
 }
 
@@ -15,6 +23,8 @@ class StoryArcApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(routerProvider);
+
     return MaterialApp.router(
       title: 'StoryArc',
       theme: CosmicTheme.darkTheme,
