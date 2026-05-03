@@ -20,10 +20,10 @@ Replace complex image generation with a lightweight, symbolic anchoring system. 
 4.  Update the `TimelineNode` to prominently display the `sessionEmoji`.
 
 ## Validation & Success Criteria
-*   [ ] Gemini consistently suggests contextually relevant emojis for diverse session topics.
-*   [ ] Selected emojis are correctly persisted in the Firestore `Session` document.
-*   [ ] The Narrative Timeline displays the session emoji clearly, improving scannability.
-*   [ ] Manual emoji selection works seamlessly if AI suggestions are rejected.
+*   [x] Gemini consistently suggests contextually relevant emojis for diverse session topics.
+*   [x] Selected emojis are correctly persisted in the Firestore `Session` document.
+*   [x] The Narrative Timeline displays the session emoji clearly, improving scannability.
+*   [x] Manual emoji selection works seamlessly if AI suggestions are rejected.
 
 ---
 
@@ -33,8 +33,17 @@ Replace complex image generation with a lightweight, symbolic anchoring system. 
    - **Root Cause**: Cinematic image generation introduced significant latency (~10s), high operational costs, and storage complexity.
    - **Implementation**: Pivoted to a symbolic anchor system using Emojis. This removed the dependency on Imagen/Vertex AI and eliminated the need for Firebase Storage media management.
 
+2. **Emoji Studio Post-Session Flow (Finalized - May 03)**:
+   - **Root Cause**: Popping the session screen immediately after recording caused a "logic gap" where AI-generated metadata appeared without user confirmation.
+   - **Implementation**: Refactored `LiveInterviewScreen` and `ManualEntryScreen` to wait for `AnalysisService` completion. Implemented `EmojiStudioWidget` as a modal bottom sheet that presents AI suggestions immediately after synthesis, ensuring the user is part of the "Narrative Weaving" process.
+
+3. **Hero Symbol Timeline Integration (Finalized - May 03)**:
+   - **Root Cause**: The original `TimelineWidget` used simple circles, missing the "Cinematic" visual goal.
+   - **Implementation**: Updated the timeline node to a 32dp "Hero Symbol" container with mood-adaptive glows and gradients. It prominently displays the `selectedEmoji`, creating a scannable visual index of the user's journey.
+
 ## 🎬 Active Limitations & Narrative Backlog
 
+- **Analysis Latency**: Waiting for Gemini to synthesize a transcript can take 2-4 seconds. While a loading state is shown, optimizing the prompt or using a smaller model for faster emoji-only extraction is suggested.
 - **Emoji Consistency**: Different OS versions (iOS vs Android) may render emojis differently. Standardizing on a web-safe emoji font or using SVG assets for key symbols is suggested.
 - **Symbolic Trends**: Implementing a "Mood Cloud" that visualizes the most used emojis across a Plotline is suggested for Phase 5.
 - **Narrative Continuity**: Ensuring the AI doesn't suggest the same emoji for every session in a Plotline to maintain visual variety.

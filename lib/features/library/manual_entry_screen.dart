@@ -7,6 +7,7 @@ import '../../models/plotline.dart';
 import '../../repositories/session_repository.dart';
 import '../../repositories/plotline_repository.dart';
 import '../../services/analysis_service.dart';
+import 'widgets/emoji_studio_widget.dart';
 import '../../../core/theme.dart';
 
 class ManualEntryScreen extends ConsumerStatefulWidget {
@@ -108,13 +109,12 @@ class _ManualEntryScreenState extends ConsumerState<ManualEntryScreen> {
       final sessionRepo = ref.read(sessionRepositoryProvider);
       await sessionRepo.addSession(session);
       
-      // Trigger AI Analysis in the background
-      _triggerAnalysis(session);
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Entry saved. The Biographer is reflecting...")),
-        );
+      // Wait for AI Analysis to present Emoji Studio
+      final updatedSession = await _triggerAnalysis(session);
+      
+      if (mounted && updatedSession != null) {
+        _showEmojiStudio(updatedSession);
+      } else if (mounted) {
         context.pop();
       }
     } catch (e) {
@@ -128,7 +128,7 @@ class _ManualEntryScreenState extends ConsumerState<ManualEntryScreen> {
     }
   }
 
-  void _triggerAnalysis(Session session) async {
+  Future<Session?> _triggerAnalysis(Session session) async {
     final analysisService = ref.read(analysisServiceProvider);
     final sessionRepo = ref.read(sessionRepositoryProvider);
 
@@ -147,7 +147,26 @@ class _ManualEntryScreenState extends ConsumerState<ManualEntryScreen> {
         type: session.type,
       );
       await sessionRepo.addSession(updatedSession);
+      return updatedSession;
     }
+    return null;
+  }
+
+  void _showEmojiStudio(Session session) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => EmojiStudioWidget(
+        session: session,
+        onComplete: () {
+          Navigator.pop(context); // Close bottom sheet
+          if (mounted) Navigator.pop(this.context); // Exit ManualEntryScreen
+        },
+      ),
+    ).then((_) {
+      if (mounted) Navigator.pop(context);
+    });
   }
 
   @override

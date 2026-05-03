@@ -10,6 +10,7 @@ import '../../services/gemini_live_service.dart';
 import '../../models/session.dart';
 import '../../repositories/session_repository.dart';
 import '../../services/analysis_service.dart';
+import '../library/widgets/emoji_studio_widget.dart';
 import 'widgets/cosmic_visualizer.dart';
 
 class LiveInterviewScreen extends ConsumerStatefulWidget {
@@ -69,11 +70,23 @@ class _LiveInterviewScreenState extends ConsumerState<LiveInterviewScreen> {
     }
   }
 
-  void _endSession() async {
+  bool _isAnalyzing = false;
+  Session? _analyzedSession;
+
+  Future<void> _endSession() async {
     final gemini = ref.read(geminiLiveServiceProvider);
     final transcript = gemini.fullTranscript;
     
+    // Stop recording and disconnect immediately to free resources
+    ref.read(audioServiceProvider).stopRecording();
+    gemini.disconnect();
+
     if (transcript.isNotEmpty && widget.plotlineId != null) {
+      setState(() {
+        _isAnalyzing = true;
+        _status = "Synthesizing Narrative...";
+      });
+
       final session = Session(
         id: const Uuid().v4(),
         plotlineId: widget.plotlineId!,
@@ -83,17 +96,13 @@ class _LiveInterviewScreenState extends ConsumerState<LiveInterviewScreen> {
       );
 
       await ref.read(sessionRepositoryProvider).addSession(session);
-      _triggerAnalysis(session);
-    }
-
-    ref.read(audioServiceProvider).stopRecording();
-    gemini.disconnect();
-    if (mounted) {
-      context.pop();
+      await _triggerAnalysis(session);
+    } else {
+      if (mounted) context.pop();
     }
   }
 
-  void _triggerAnalysis(Session session) async {
+  Future<void> _triggerAnalysis(Session session) async {
     final analysisService = ref.read(analysisServiceProvider);
     final sessionRepo = ref.read(sessionRepositoryProvider);
 
@@ -112,7 +121,37 @@ class _LiveInterviewScreenState extends ConsumerState<LiveInterviewScreen> {
         type: session.type,
       );
       await sessionRepo.addSession(updatedSession);
+      
+      if (mounted) {
+        setState(() {
+          _isAnalyzing = false;
+          _analyzedSession = updatedSession;
+        });
+        _showEmojiStudio(updatedSession);
+      }
+    } else {
+      if (mounted) context.pop();
     }
+  }
+
+  void _showEmojiStudio(Session session) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => EmojiStudioWidget(
+        session: session,
+        onComplete: () {
+          Navigator.pop(context); // Close bottom sheet
+          if (mounted) Navigator.pop(this.context); // Exit LiveInterviewScreen
+        },
+      ),
+    ).then((_) {
+      // If they dismissed the bottom sheet without picking, just pop the screen
+      if (mounted && _analyzedSession != null) {
+        Navigator.pop(context);
+      }
+    });
   }
 
   @override
@@ -161,18 +200,27 @@ class _LiveInterviewScreenState extends ConsumerState<LiveInterviewScreen> {
                     ],
                   ),
                   const Spacer(),
-                  Text(
-                    "Speak your truth.",
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                      color: Colors.white.withOpacity(0.8),
-                    ),
-                  ).animate().fadeIn(duration: 1000.ms),
+                  if (_isAnalyzing)
+                    const Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(CosmicTheme.accentSoftCyan),
+                      ),
+                    ).animate().fadeIn()
+                  else
+                    Text(
+                      "Speak your truth.",
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                        color: Colors.white.withOpacity(0.8),
+                      ),
+                    ).animate().fadeIn(duration: 1000.ms),
                   const SizedBox(height: 12),
-                  const Text(
-                    "The Biographer is listening and weaving your narrative.",
+                  Text(
+                    _isAnalyzing 
+                      ? "The Biographer is distilling your narrative into symbolic anchors..."
+                      : "The Biographer is listening and weaving your narrative.",
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white38, fontSize: 14),
+                    style: const TextStyle(color: Colors.white38, fontSize: 14),
                   ).animate().fadeIn(delay: 500.ms),
                   const Spacer(),
                   const SizedBox(height: 60),

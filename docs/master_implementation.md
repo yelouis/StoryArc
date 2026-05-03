@@ -34,17 +34,17 @@ The objective is to move from "log-based" journaling to "story-based" reflection
 ### [Phase 0: The Project North Star & Foundation](file:///Users/louisye/Desktop/Louis/StoryArc/docs/phase_0_foundation.md) [COMPLETE]
 **Goal:** Establish the Flutter environment, theme, and core data models. Focus on the architectural "spine" of the app.
 
-### [Phase 1: The Narrative Core (Library & Basic Input)](file:///Users/louisye/Desktop/Louis/StoryArc/docs/phase_1_narrative_core.md)
+### [Phase 1: The Narrative Core (Library & Basic Input)](file:///Users/louisye/Desktop/Louis/StoryArc/docs/phase_1_narrative_core.md) [COMPLETE]
 **Goal:** Implement the Plotline Library dashboard and manual entry capabilities. This establishes the CRUD layer and navigation.
 
-### [Phase 2: The Live Experience (Real-Time Interaction)](file:///Users/louisye/Desktop/Louis/StoryArc/docs/phase_2_live_experience.md)
+### [Phase 2: The Live Experience (Real-Time Interaction)](file:///Users/louisye/Desktop/Louis/StoryArc/docs/phase_2_live_experience.md) [COMPLETE]
 **Goal:** Integrate the Gemini Multimodal Live API and build the real-time audio visualizer for the core "Interview" experience.
 
-### [Phase 3: Intelligence & Reflection (The Narrative Engine)](file:///Users/louisye/Desktop/Louis/StoryArc/docs/phase_3_intelligence.md)
+### [Phase 3: Intelligence & Reflection (The Narrative Engine)](file:///Users/louisye/Desktop/Louis/StoryArc/docs/phase_3_intelligence.md) [COMPLETE]
 **Goal:** Automate session analysis (summaries, mood) and build the interactive Narrative Timeline.
 
-### [Phase 4: Cinematic Storytelling (The Image Studio)](file:///Users/louisye/Desktop/Louis/StoryArc/docs/phase_4_cinematic_storytelling.md)
-**Goal:** Implement AI image generation and the visual gallery to bring memories to life.
+### [Phase 4: Symbolic Anchors (The Emoji Studio)](file:///Users/louisye/Desktop/Louis/StoryArc/docs/phase_4_cinematic_storytelling.md) [COMPLETE]
+**Goal:** Replace complex image generation with a lightweight, symbolic anchoring system using AI-suggested emojis.
 
 ---
 
@@ -65,6 +65,10 @@ The objective is to move from "log-based" journaling to "story-based" reflection
 2. **Secure Onboarding & Component Architecture (Finalized - May 03)**:
    - **Root Cause**: Handling user-provided API keys required a secure, persistent, and reactive solution, while the UI needed a premium, reusable design system.
    - **Implementation**: Implemented a cinematic "Prologue" and "Connection Studio" flow utilizing `flutter_secure_storage` and a suite of frosted-glass `ArcWidgets` to ensure both security and a high-end aesthetic from the first launch.
+
+3. **Symbolic Pivot & Emoji Studio (Finalized - May 03)**:
+   - **Root Cause**: High latency and operational costs of image generation threatened the "Live" feel of the app.
+   - **Implementation**: Pivoted to a symbolic anchor system. Developed the `EmojiStudioWidget` and integrated it into the post-session flow for both voice and manual entries, allowing users to select AI-suggested "Hero Symbols" for their timeline.
 
 ## 🎬 Active Limitations & Narrative Backlog
 

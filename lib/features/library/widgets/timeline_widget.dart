@@ -49,18 +49,25 @@ class TimelineWidget extends StatelessWidget {
               Column(
                 children: [
                   Container(
-                    width: 12,
-                    height: 12,
+                    width: 32,
+                    height: 32,
                     decoration: BoxDecoration(
-                      color: moodColor,
+                      color: moodColor.withOpacity(0.2),
                       shape: BoxShape.circle,
+                      border: Border.all(color: moodColor.withOpacity(0.5), width: 2),
                       boxShadow: [
                         BoxShadow(
-                          color: moodColor.withOpacity(0.5),
-                          blurRadius: 8,
+                          color: moodColor.withOpacity(0.3),
+                          blurRadius: 10,
                           spreadRadius: 2,
                         ),
                       ],
+                    ),
+                    child: Center(
+                      child: Text(
+                        session.selectedEmoji ?? (session.emojis.isNotEmpty ? session.emojis.first : '✦'),
+                        style: const TextStyle(fontSize: 18),
+                      ),
                     ),
                   ),
                   if (!isLast)
@@ -82,7 +89,7 @@ class TimelineWidget extends StatelessWidget {
                     ),
                 ],
               ),
-              const SizedBox(width: 24),
+              const SizedBox(width: 16),
               // Session Content
               Expanded(
                 child: GestureDetector(
@@ -103,12 +110,6 @@ class TimelineWidget extends StatelessWidget {
                                 letterSpacing: 1.2,
                               ),
                             ),
-                            const Spacer(),
-                            if (session.emojis.isNotEmpty)
-                              Text(
-                                session.emojis.join(' '),
-                                style: const TextStyle(fontSize: 16),
-                              ),
                           ],
                         ),
                         const SizedBox(height: 8),

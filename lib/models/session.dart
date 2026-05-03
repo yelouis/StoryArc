@@ -12,6 +12,7 @@ class Session {
   final String? moodKeyword;
   final double moodScore; // -1.0 to 1.0
   final List<String> emojis;
+  final String? selectedEmoji;
   final SessionType type;
 
   Session({
@@ -24,6 +25,7 @@ class Session {
     this.moodKeyword,
     this.moodScore = 0.0,
     this.emojis = const [],
+    this.selectedEmoji,
     required this.type,
   });
 
@@ -38,6 +40,7 @@ class Session {
       'moodKeyword': moodKeyword,
       'moodScore': moodScore,
       'emojis': emojis,
+      'selectedEmoji': selectedEmoji,
       'type': type.name,
     };
   }
@@ -53,6 +56,7 @@ class Session {
       moodKeyword: map['moodKeyword'],
       moodScore: (map['moodScore'] as num?)?.toDouble() ?? 0.0,
       emojis: List<String>.from(map['emojis'] ?? []),
+      selectedEmoji: map['selectedEmoji'],
       type: SessionType.values.firstWhere(
         (e) => e.name == map['type'],
         orElse: () => SessionType.manual,
