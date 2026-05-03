@@ -65,22 +65,26 @@ Build the primary user interface and CRUD functionality for managing Plotlines a
 
 1. **Plotline-Session Relationship (Finalized - May 03)**:
    - **Root Cause**: Initial model design had weak coupling between sessions and plotlines, risking orphaned data.
-   - **Implementation**: Enforced `isar` links (planned) and Firestore sub-collections between `Session` and `Plotline` objects to ensure referential integrity.
+   - **Implementation**: Enforced Firestore sub-collections (`users/{userId}/plotlines/{plotlineId}/sessions`) for `Session` objects to ensure referential integrity and logical grouping.
 
 2. **Narrative Repository Pattern (Finalized - May 03)**:
    - **Root Cause**: Direct Firestore calls from the UI would lead to tight coupling and difficult testing.
-   - **Implementation**: Implemented a `PlotlineRepository` class and integrated it with Riverpod providers to abstract data access and handle per-user isolation.
+   - **Implementation**: Implemented `PlotlineRepository` and `SessionRepository` using Riverpod providers. Added automatic `lastActive` timestamp updates on the `Plotline` whenever a new `Session` is added.
 
 3. **Glassmorphic UI Foundation (Finalized - May 03)**:
    - **Root Cause**: Standard Material cards lacked the "Cinematic" feel required for the project.
-   - **Implementation**: Created the `PlotlineCard` using custom opacity-based decoration and `flutter_animate` for smooth entry transitions.
+   - **Implementation**: Refactored `PlotlineCard` with `flutter_animate` to include scale-up transitions, shimmer effects, and a custom pinning mechanism.
+
+4. **Dynamic Library Filtering (Finalized - May 03)**:
+   - **Root Cause**: A static list of plotlines becomes unmanageable as the library grows.
+   - **Implementation**: Implemented a functional search system and a "Pinned" section in `LibraryScreen` to prioritize active narratives.
 
 ## 🎬 Active Limitations & Narrative Backlog
 
-- **Emoji Picker Performance**: The standard `emoji_picker_flutter` can cause jank on lower-end devices during the initial load. Optimizing the asset pre-loading or using a native picker is suggested.
-- **Draft Persistence**: Manual entries currently lose state if the app process is killed. Implementing an `AutoSaveProvider` that debounces to Firestore is suggested.
-- **Library Clutter**: As the number of Plotlines increases, the dashboard becomes hard to manage. Implementing "Archived Plotlines" to hide completed stories is suggested.
-- **Offline Integrity**: Firestore handles basic offline sync. However, planning for complex "conflict resolution" (e.g., editing the same note on two devices) is suggested.
+- **Emoji Picker Performance**: The standard `emoji_picker_flutter` can cause minor frame drops during the first load. Investigating pre-caching or native picker alternatives for Phase 2.
+- **Advanced Conflict Resolution**: Firestore handles basic offline sync, but concurrent edits on multiple devices for the same entry are not yet handled with a specific merge strategy.
+- **Rich Text Support**: Manual entries are currently plain text. Implementing a Markdown or Delta-based rich text editor is suggested for Phase 2.
+- **Draft Recovery**: While local state holds the current entry, a crash during editing would result in data loss. Implementing an `Isar`-based local draft cache is suggested.
 
 
 

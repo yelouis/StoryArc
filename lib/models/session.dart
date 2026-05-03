@@ -1,49 +1,42 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+enum SessionType { manual, voice }
+
 class Session {
   final String id;
+  final String content;
+  final DateTime createdAt;
   final String plotlineId;
-  final DateTime date;
-  final String transcript;
-  final String? summary;
-  final String? moodKeyword;
-  final double moodScore; // -1.0 to 1.0
-  final String? emoji; // Visual anchor for the session
+  final SessionType type;
 
   Session({
     required this.id,
+    required this.content,
+    required this.createdAt,
     required this.plotlineId,
-    required this.date,
-    required this.transcript,
-    this.summary,
-    this.moodKeyword,
-    required this.moodScore,
-    this.emoji,
+    required this.type,
   });
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
+      'content': content,
+      'createdAt': Timestamp.fromDate(createdAt),
       'plotlineId': plotlineId,
-      'date': Timestamp.fromDate(date),
-      'transcript': transcript,
-      'summary': summary,
-      'moodKeyword': moodKeyword,
-      'moodScore': moodScore,
-      'emoji': emoji,
+      'type': type.name,
     };
   }
 
   factory Session.fromMap(Map<String, dynamic> map) {
     return Session(
       id: map['id'] ?? '',
+      content: map['content'] ?? '',
+      createdAt: (map['createdAt'] as Timestamp).toDate(),
       plotlineId: map['plotlineId'] ?? '',
-      date: (map['date'] as Timestamp).toDate(),
-      transcript: map['transcript'] ?? '',
-      summary: map['summary'],
-      moodKeyword: map['moodKeyword'],
-      moodScore: (map['moodScore'] as num?)?.toDouble() ?? 0.0,
-      emoji: map['emoji'],
+      type: SessionType.values.firstWhere(
+        (e) => e.name == map['type'],
+        orElse: () => SessionType.manual,
+      ),
     );
   }
 }

@@ -7,11 +7,13 @@ import 'package:intl/intl.dart';
 class PlotlineCard extends StatelessWidget {
   final Plotline plotline;
   final VoidCallback onTap;
+  final VoidCallback onPinToggle;
 
   const PlotlineCard({
     super.key,
     required this.plotline,
     required this.onTap,
+    required this.onPinToggle,
   });
 
   @override
@@ -64,13 +66,32 @@ class PlotlineCard extends StatelessWidget {
                 ],
               ),
             ),
+            IconButton(
+              icon: Icon(
+                plotline.isPinned ? Icons.push_pin : Icons.push_pin_outlined,
+                color: plotline.isPinned ? CosmicTheme.accentElectricPurple : Colors.white24,
+                size: 20,
+              ),
+              onPressed: onPinToggle,
+            ),
             const Icon(
               Icons.chevron_right,
               color: Colors.white54,
             ),
           ],
         ),
-      ).animate().fadeIn(duration: 400.ms).slideX(begin: 0.1),
+      )
+          .animate(onPlay: (controller) => controller.repeat(reverse: true))
+          .shimmer(duration: 3.seconds, color: Colors.white10)
+          .animate()
+          .fadeIn(duration: 400.ms)
+          .slideX(begin: 0.1)
+          .scale(
+            begin: const Offset(0.95, 0.95),
+            end: const Offset(1.0, 1.0),
+            duration: 400.ms,
+            curve: Curves.easeOutCubic,
+          ),
     );
   }
 }

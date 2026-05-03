@@ -4,12 +4,37 @@ import '../../../repositories/plotline_repository.dart';
 import 'widgets/plotline_card.dart';
 import '../../../core/theme.dart';
 
-class LibraryScreen extends ConsumerWidget {
+class LibraryScreen extends ConsumerStatefulWidget {
   const LibraryScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final plotlinesAsyncValue = ref.watch(plotlineRepositoryProvider).getPlotlines();
+  ConsumerState<LibraryScreen> createState() => _LibraryScreenState();
+}
+
+class _LibraryScreenState extends ConsumerState<LibraryScreen> {
+  final _searchController = TextEditingController();
+  String _searchQuery = "";
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(() {
+      setState(() {
+        _searchQuery = _searchController.text.toLowerCase();
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final plotlineRepo = ref.watch(plotlineRepositoryProvider);
+    final plotlinesStream = plotlineRepo.getPlotlines();
 
     return Scaffold(
       appBar: AppBar(
@@ -24,9 +49,16 @@ class LibraryScreen extends ConsumerWidget {
           children: [
             const SizedBox(height: 10),
             TextField(
+              controller: _searchController,
               decoration: InputDecoration(
                 hintText: "Search narratives...",
                 prefixIcon: const Icon(Icons.search, color: Colors.white54),
+                suffixIcon: _searchQuery.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear, color: Colors.white54),
+                        onPressed: () => _searchController.clear(),
+                      )
+                    : null,
                 filled: true,
                 fillColor: CosmicTheme.glassWhite,
                 border: OutlineInputBorder(
@@ -38,7 +70,7 @@ class LibraryScreen extends ConsumerWidget {
             const SizedBox(height: 24),
             Expanded(
               child: StreamBuilder(
-                stream: plotlinesAsyncValue,
+                stream: plotlinesStream,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
@@ -48,9 +80,13 @@ class LibraryScreen extends ConsumerWidget {
                     return Center(child: Text("Error: ${snapshot.error}"));
                   }
 
-                  final plotlines = snapshot.data ?? [];
+                  final allPlotlines = snapshot.data ?? [];
+                  final filteredPlotlines = allPlotlines.where((p) {
+                    return p.title.toLowerCase().contains(_searchQuery) ||
+                        p.emoji.contains(_searchQuery);
+                  }).toList();
 
-                  if (plotlines.isEmpty) {
+                  if (allPlotlines.isEmpty) {
                     return Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -63,9 +99,14 @@ class LibraryScreen extends ConsumerWidget {
                           ),
                           const SizedBox(height: 24),
                           ElevatedButton(
-                            onPressed: () {
-                              // Navigate to Add Plotline
-                            },
+                            onPressed: () => GoRouter.of(context).push('/add-plotline'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: CosmicTheme.accentElectricPurple,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
                             child: const Text("New Narrative"),
                           ),
                         ],
@@ -73,16 +114,57 @@ class LibraryScreen extends ConsumerWidget {
                     );
                   }
 
-                  return ListView.builder(
-                    itemCount: plotlines.length,
-                    itemBuilder: (context, index) {
-                      return PlotlineCard(
-                        plotline: plotlines[index],
-                        onTap: () {
-                          // Navigate to Timeline
-                        },
-                      );
-                    },
+                  final pinnedPlotlines = filteredPlotlines.where((p) => p.isPinned).toList();
+                  final otherPlotlines = filteredPlotlines.where((p) => !p.isPinned).toList();
+
+                  return ListView(
+                    children: [
+                      if (pinnedPlotlines.isNotEmpty) ...[
+                        const Text(
+                          "PINNED",
+                          style: TextStyle(
+                            color: Colors.white38,
+                            letterSpacing: 1.2,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        ...pinnedPlotlines.map((p) => PlotlineCard(
+                              plotline: p,
+                              onTap: () => GoRouter.of(context).push('/manual-entry', extra: p),
+                              onPinToggle: () => plotlineRepo.togglePin(p.id, !p.isPinned),
+                            )),
+                        const SizedBox(height: 24),
+                      ],
+                      if (otherPlotlines.isNotEmpty) ...[
+                        const Text(
+                          "ALL NARRATIVES",
+                          style: TextStyle(
+                            color: Colors.white38,
+                            letterSpacing: 1.2,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        ...otherPlotlines.map((p) => PlotlineCard(
+                              plotline: p,
+                              onTap: () => GoRouter.of(context).push('/manual-entry', extra: p),
+                              onPinToggle: () => plotlineRepo.togglePin(p.id, !p.isPinned),
+                            )),
+                      ],
+                      if (filteredPlotlines.isEmpty)
+                        const Center(
+                          child: Padding(
+                            padding: EdgeInsets.only(top: 40),
+                            child: Text(
+                              "No matching plotlines found.",
+                              style: TextStyle(color: Colors.white38),
+                            ),
+                          ),
+                        ),
+                    ],
                   );
                 },
               ),
@@ -91,9 +173,7 @@ class LibraryScreen extends ConsumerWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Navigate to Add Plotline
-        },
+        onPressed: () => GoRouter.of(context).push('/add-plotline'),
         backgroundColor: CosmicTheme.accentElectricPurple,
         child: const Icon(Icons.add, color: Colors.white),
       ),

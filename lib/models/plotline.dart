@@ -7,6 +7,7 @@ class Plotline {
   final String title;
   final String emoji;
   final PlotlineStatus status;
+  final bool isPinned;
   final DateTime createdAt;
   final DateTime lastActive;
 
@@ -15,6 +16,7 @@ class Plotline {
     required this.title,
     required this.emoji,
     this.status = PlotlineStatus.active,
+    this.isPinned = false,
     required this.createdAt,
     required this.lastActive,
   });
@@ -25,6 +27,7 @@ class Plotline {
       'title': title,
       'emoji': emoji,
       'status': status.name,
+      'isPinned': isPinned,
       'createdAt': Timestamp.fromDate(createdAt),
       'lastActive': Timestamp.fromDate(lastActive),
     };
@@ -39,6 +42,7 @@ class Plotline {
         (e) => e.name == map['status'],
         orElse: () => PlotlineStatus.active,
       ),
+      isPinned: map['isPinned'] ?? false,
       createdAt: (map['createdAt'] as Timestamp).toDate(),
       lastActive: (map['lastActive'] as Timestamp).toDate(),
     );

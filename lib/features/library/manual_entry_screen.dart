@@ -1,11 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../models/plotline.dart';
-import '../../repositories/plotline_repository.dart';
+import 'package:uuid/uuid.dart';
+import '../../models/session.dart';
+import '../../repositories/session_repository.dart';
+import '../../../core/theme.dart';
+import 'package:go_router/go_router.dart';
 
 class ManualEntryScreen extends ConsumerStatefulWidget {
   final Plotline? initialPlotline;
-  
+
   const ManualEntryScreen({super.key, this.initialPlotline});
 
   @override
@@ -15,11 +16,69 @@ class ManualEntryScreen extends ConsumerStatefulWidget {
 class _ManualEntryScreenState extends ConsumerState<ManualEntryScreen> {
   final _contentController = TextEditingController();
   Plotline? _selectedPlotline;
+  bool _isSaving = false;
 
   @override
   void initState() {
     super.initState();
     _selectedPlotline = widget.initialPlotline;
+  }
+
+  void _showPlotlineSelector() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1A1A2E),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+      ),
+      builder: (context) {
+        return Consumer(
+          builder: (context, ref, child) {
+            final plotlinesStream = ref.watch(plotlineRepositoryProvider).getPlotlines();
+            return StreamBuilder<List<Plotline>>(
+              stream: plotlinesStream,
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+                final plotlines = snapshot.data!;
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.all(20.0),
+                      child: Text(
+                        "Assign to Plotline",
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                      ),
+                    ),
+                    Flexible(
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: plotlines.length,
+                        itemBuilder: (context, index) {
+                          final p = plotlines[index];
+                          return ListTile(
+                            leading: Text(p.emoji, style: const TextStyle(fontSize: 24)),
+                            title: Text(p.title, style: const TextStyle(color: Colors.white)),
+                            onTap: () {
+                              setState(() => _selectedPlotline = p);
+                              Navigator.pop(context);
+                            },
+                            trailing: _selectedPlotline?.id == p.id
+                                ? const Icon(Icons.check, color: CosmicTheme.accentElectricPurple)
+                                : null,
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                );
+              },
+            );
+          },
+        );
+      },
+    );
   }
 
   void _saveEntry() async {
@@ -30,12 +89,33 @@ class _ManualEntryScreenState extends ConsumerState<ManualEntryScreen> {
       return;
     }
 
-    // TODO: Implement Session saving via a SessionRepository
-    // For now, we'll just simulate a save
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Entry saved to narrative.")),
+    setState(() => _isSaving = true);
+
+    final session = Session(
+      id: const Uuid().v4(),
+      content: _contentController.text,
+      createdAt: DateTime.now(),
+      plotlineId: _selectedPlotline!.id,
+      type: SessionType.manual,
     );
-    Navigator.pop(context);
+
+    try {
+      await ref.read(sessionRepositoryProvider).addSession(session);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Entry saved to narrative.")),
+        );
+        context.pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Failed to save: $e")),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
   }
 
   @override
@@ -43,48 +123,68 @@ class _ManualEntryScreenState extends ConsumerState<ManualEntryScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("New Entry"),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         actions: [
-          TextButton(
-            onPressed: _saveEntry,
-            child: const Text("Save", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-          ),
+          if (_isSaving)
+            const Center(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
+              ),
+            )
+          else
+            TextButton(
+              onPressed: _saveEntry,
+              child: const Text(
+                "Save",
+                style: TextStyle(color: CosmicTheme.accentElectricPurple, fontWeight: FontWeight.bold),
+              ),
+            ),
         ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           children: [
-            // Plotline Selector (Simplified)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.white10,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.auto_stories, color: Colors.white54),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      _selectedPlotline?.title ?? "Select Plotline...",
-                      style: TextStyle(
-                        color: _selectedPlotline == null ? Colors.white38 : Colors.white,
-                        fontSize: 16,
+            GestureDetector(
+              onTap: _showPlotlineSelector,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: CosmicTheme.glassWhite,
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: Colors.white10),
+                ),
+                child: Row(
+                  children: [
+                    Text(
+                      _selectedPlotline?.emoji ?? "📖",
+                      style: const TextStyle(fontSize: 20),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        _selectedPlotline?.title ?? "Select Plotline...",
+                        style: TextStyle(
+                          color: _selectedPlotline == null ? Colors.white38 : Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
-                  ),
-                  const Icon(Icons.arrow_drop_down, color: Colors.white54),
-                ],
+                    const Icon(Icons.keyboard_arrow_down, color: Colors.white54),
+                  ],
+                ),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
             Expanded(
               child: TextField(
                 controller: _contentController,
                 maxLines: null,
                 expands: true,
-                style: const TextStyle(fontSize: 18, height: 1.5),
+                style: const TextStyle(fontSize: 18, height: 1.6, color: Colors.white),
                 decoration: const InputDecoration(
                   hintText: "What's on your mind?",
                   hintStyle: TextStyle(color: Colors.white24),

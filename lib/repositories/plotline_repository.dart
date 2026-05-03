@@ -40,4 +40,8 @@ class PlotlineRepository {
   Future<void> deletePlotline(String id) async {
     await _plotlinesCollection.doc(id).delete();
   }
+
+  Future<void> togglePin(String plotlineId, bool isPinned) async {
+    await _plotlinesCollection.doc(plotlineId).update({'isPinned': isPinned});
+  }
 }
