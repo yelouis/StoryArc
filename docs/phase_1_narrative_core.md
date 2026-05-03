@@ -65,7 +65,15 @@ Build the primary user interface and CRUD functionality for managing Plotlines a
 
 1. **Plotline-Session Relationship (Finalized - May 03)**:
    - **Root Cause**: Initial model design had weak coupling between sessions and plotlines, risking orphaned data.
-   - **Implementation**: Enforced `isar` links between `Session` and `Plotline` objects to ensure referential integrity and simplify "Narrative Engine" lookups.
+   - **Implementation**: Enforced `isar` links (planned) and Firestore sub-collections between `Session` and `Plotline` objects to ensure referential integrity.
+
+2. **Narrative Repository Pattern (Finalized - May 03)**:
+   - **Root Cause**: Direct Firestore calls from the UI would lead to tight coupling and difficult testing.
+   - **Implementation**: Implemented a `PlotlineRepository` class and integrated it with Riverpod providers to abstract data access and handle per-user isolation.
+
+3. **Glassmorphic UI Foundation (Finalized - May 03)**:
+   - **Root Cause**: Standard Material cards lacked the "Cinematic" feel required for the project.
+   - **Implementation**: Created the `PlotlineCard` using custom opacity-based decoration and `flutter_animate` for smooth entry transitions.
 
 ## 🎬 Active Limitations & Narrative Backlog
 

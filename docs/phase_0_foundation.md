@@ -97,10 +97,13 @@ Establish the architectural foundation of the Story Arc Flutter application, inc
    - **Root Cause**: Initial project scoping required a balance between rapid prototyping (Flutter) and heavy AI integration (Gemini).
    - **Implementation**: Adopted a feature-first directory structure and established Riverpod as the single source of truth for the `Narrative Engine` state to prevent logic fragmentation.
 
+2. **Manual Project Initialization (Finalized - May 03)**:
+   - **Root Cause**: Environment constraints prevented the use of the `flutter create` CLI command.
+   - **Implementation**: Manually constructed the Flutter project structure, `pubspec.yaml`, and core architecture files to bypass environment limitations while maintaining structural integrity.
+
 ## 🎬 Active Limitations & Narrative Backlog
 
 - **Firestore Collection Scaling**: Currently, large datasets are handled via standard listeners. Moving to a paginated fetching strategy for the `Timeline` is suggested before Phase 1 completion.
-
 - **Theme Flexibility**: The cosmic theme is hardcoded for dark mode. Implementing a dynamic theme switcher that reacts to the current "Plotline mood" is suggested for Phase 3.
 - **Secure Storage**: Sensitive data like API keys should not be stored in plain Firestore. Utilizing `flutter_secure_storage` for the `AppConfig` sensitive fields is highly suggested.
 - **Firestore Indexing**: As the "Narrative Engine" complexity grows, composite indexes will be required for complex timeline filtering.
