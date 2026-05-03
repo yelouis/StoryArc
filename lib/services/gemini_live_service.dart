@@ -21,6 +21,9 @@ class GeminiLiveService {
   final _textResponseController = StreamController<String>.broadcast();
   Stream<String> get textResponseStream => _textResponseController.stream;
 
+  final List<String> _transcriptParts = [];
+  String get fullTranscript => _transcriptParts.join("\n");
+
   GeminiLiveService(this.apiKey);
 
   Future<void> connect() async {
@@ -82,7 +85,9 @@ class GeminiLiveService {
                 _audioResponseController.add(audioData);
               }
             } else if (part['text'] != null) {
-              _textResponseController.add(part['text']);
+              final text = part['text'];
+              _transcriptParts.add("Biographer: $text");
+              _textResponseController.add(text);
             }
           }
         }

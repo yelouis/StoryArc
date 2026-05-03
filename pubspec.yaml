@@ -26,6 +26,7 @@ dependencies:
   web_socket_channel: ^2.4.5
   uuid: ^4.4.0
   flutter_pcm_sound: ^1.0.3
+  http: ^1.2.1
 
 dev_dependencies:
   flutter_test:

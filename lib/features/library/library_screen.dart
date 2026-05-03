@@ -139,7 +139,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
                         const SizedBox(height: 12),
                         ...pinnedPlotlines.map((p) => PlotlineCard(
                               plotline: p,
-                              onTap: () => GoRouter.of(context).push('/manual-entry', extra: p),
+                              onTap: () => GoRouter.of(context).push('/plotline-detail', extra: p),
                               onPinToggle: () => plotlineRepo.togglePin(p.id, !p.isPinned),
                             )),
                         const SizedBox(height: 24),
@@ -157,7 +157,7 @@ class _LibraryScreenState extends ConsumerState<LibraryScreen> {
                         const SizedBox(height: 12),
                         ...otherPlotlines.map((p) => PlotlineCard(
                               plotline: p,
-                              onTap: () => GoRouter.of(context).push('/manual-entry', extra: p),
+                              onTap: () => GoRouter.of(context).push('/plotline-detail', extra: p),
                               onPinToggle: () => plotlineRepo.togglePin(p.id, !p.isPinned),
                             )),
                       ],

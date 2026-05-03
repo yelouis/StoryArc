@@ -7,10 +7,11 @@ class Session {
   final String plotlineId;
   final DateTime createdAt;
   final String transcript;
+  final String? title;
   final String? summary;
   final String? moodKeyword;
   final double moodScore; // -1.0 to 1.0
-  final String? emoji;
+  final List<String> emojis;
   final SessionType type;
 
   Session({
@@ -18,10 +19,11 @@ class Session {
     required this.plotlineId,
     required this.createdAt,
     required this.transcript,
+    this.title,
     this.summary,
     this.moodKeyword,
     this.moodScore = 0.0,
-    this.emoji,
+    this.emojis = const [],
     required this.type,
   });
 
@@ -31,10 +33,11 @@ class Session {
       'plotlineId': plotlineId,
       'createdAt': Timestamp.fromDate(createdAt),
       'transcript': transcript,
+      'title': title,
       'summary': summary,
       'moodKeyword': moodKeyword,
       'moodScore': moodScore,
-      'emoji': emoji,
+      'emojis': emojis,
       'type': type.name,
     };
   }
@@ -45,10 +48,11 @@ class Session {
       plotlineId: map['plotlineId'] ?? '',
       createdAt: (map['createdAt'] as Timestamp).toDate(),
       transcript: map['transcript'] ?? '',
+      title: map['title'],
       summary: map['summary'],
       moodKeyword: map['moodKeyword'],
       moodScore: (map['moodScore'] as num?)?.toDouble() ?? 0.0,
-      emoji: map['emoji'],
+      emojis: List<String>.from(map['emojis'] ?? []),
       type: SessionType.values.firstWhere(
         (e) => e.name == map['type'],
         orElse: () => SessionType.manual,

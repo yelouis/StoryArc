@@ -40,13 +40,13 @@ Transform raw session transcripts into meaningful narrative data and visualize t
 
 
 ## Validation & Success Criteria
-*   [ ] Each completed session generates a summary and title within 5-10 seconds.
-*   [ ] The timeline displays sessions in reverse chronological order.
-*   [ ] Timeline nodes are color-coded correctly according to the detected mood.
+*   [x] Each completed session generates a summary and title within 5-10 seconds.
+*   [x] The timeline displays sessions in reverse chronological order.
+*   [x] Timeline nodes are color-coded correctly according to the detected mood.
 *   [ ] Tapping a timeline node displays the full AI-generated metadata.
-*   [ ] Sentiment scores consistently map to the intended colors (e.g., "Frustrated" appears reddish).
+*   [x] Sentiment scores consistently map to the intended colors (e.g., "Frustrated" appears reddish).
 *   [ ] Analysis requests are successfully rate-limited at the backend level.
-*   [ ] Malformed AI JSON responses are caught and handled gracefully without crashing the UI.
+*   [x] Malformed AI JSON responses are caught and handled gracefully without crashing the UI.
 
 
 ---
@@ -55,10 +55,20 @@ Transform raw session transcripts into meaningful narrative data and visualize t
 
 1. **Analysis Isolate Pattern (Finalized - May 03)**:
    - **Root Cause**: Parsing long session transcripts on the main thread was causing frame drops (jank) in the timeline animation.
-   - **Implementation**: Implemented the `compute` function to delegate transcript analysis to a separate Dart isolate, keeping the cosmic UI fluid.
+   - **Implementation**: Implemented the `compute` function in `AnalysisService` to delegate transcript analysis to a separate Dart isolate, keeping the cosmic UI fluid.
+
+2. **Sentiment Gradient Mapping (Finalized - May 03)**:
+   - **Root Cause**: Static mood colors failed to capture the "emotional arc" of a narrative plotline.
+   - **Implementation**: Developed `MoodColorMapper` using `Color.lerp` to interpolate between Red (-1.0), Yellow (0.0), and Green (1.0) accents.
+
+3. **Cinematic Few-Shot Prompting (Finalized - May 03)**:
+   - **Root Cause**: Generic AI summaries were breaking the premium, cinematic immersion of the StoryArc experience.
+   - **Implementation**: Refined the `AnalysisService` system instructions to enforce a "Narrative Engine" persona, requesting "punchy" titles and descriptive, cinematic summaries.
 
 ## 🎬 Active Limitations & Narrative Backlog
 
+- **Markdown-Wrapped JSON**: Gemini occasionally wraps the JSON response in markdown blocks (```json ... ```) despite strict instructions, causing parsing errors. Implementing a regex-based JSON extractor in `AnalysisService` is suggested.
+- **Backend Rate Limiting Mock**: The current implementation calls the Gemini REST API directly from the client. Deploying the Firebase Cloud Function for centralized rate limiting and API key protection is required for production hardening.
 - **Context Window Limits**: Extremely long journal sessions might exceed the initial context window for Gemini 1.5 Flash analysis. Implementing a "rolling summary" or chunked analysis strategy is suggested.
 - **Mood Color Collisions**: Highly nuanced moods (e.g., "Bitter-Sweet") can result in muddy colors. Moving to a HSL-based color interpolation for better clarity is suggested.
 - **Token Budgeting**: Frequent manual re-analysis can be costly. Implementing a caching layer for the `AnalysisService` that only triggers if the transcript change exceeds a 10% threshold is suggested.

@@ -3,13 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
+import 'package:uuid/uuid.dart';
 import '../../core/theme.dart';
 import '../../services/audio_service.dart';
 import '../../services/gemini_live_service.dart';
+import '../../models/session.dart';
+import '../../repositories/session_repository.dart';
+import '../../services/analysis_service.dart';
 import 'widgets/cosmic_visualizer.dart';
 
 class LiveInterviewScreen extends ConsumerStatefulWidget {
-  const LiveInterviewScreen({super.key});
+  final String? plotlineId;
+  const LiveInterviewScreen({super.key, this.plotlineId});
 
   @override
   ConsumerState<LiveInterviewScreen> createState() => _LiveInterviewScreenState();
@@ -64,10 +69,50 @@ class _LiveInterviewScreenState extends ConsumerState<LiveInterviewScreen> {
     }
   }
 
-  void _endSession() {
+  void _endSession() async {
+    final gemini = ref.read(geminiLiveServiceProvider);
+    final transcript = gemini.fullTranscript;
+    
+    if (transcript.isNotEmpty && widget.plotlineId != null) {
+      final session = Session(
+        id: const Uuid().v4(),
+        plotlineId: widget.plotlineId!,
+        createdAt: DateTime.now(),
+        transcript: transcript,
+        type: SessionType.voice,
+      );
+
+      await ref.read(sessionRepositoryProvider).addSession(session);
+      _triggerAnalysis(session);
+    }
+
     ref.read(audioServiceProvider).stopRecording();
-    ref.read(geminiLiveServiceProvider).disconnect();
-    context.pop();
+    gemini.disconnect();
+    if (mounted) {
+      context.pop();
+    }
+  }
+
+  void _triggerAnalysis(Session session) async {
+    final analysisService = ref.read(analysisServiceProvider);
+    final sessionRepo = ref.read(sessionRepositoryProvider);
+
+    final result = await analysisService.analyzeTranscript(session.transcript);
+    if (result != null) {
+      final updatedSession = Session(
+        id: session.id,
+        plotlineId: session.plotlineId,
+        createdAt: session.createdAt,
+        transcript: session.transcript,
+        title: result.title,
+        summary: result.summary,
+        moodKeyword: result.moodKeyword,
+        moodScore: result.moodScore,
+        emojis: result.emojis,
+        type: session.type,
+      );
+      await sessionRepo.addSession(updatedSession);
+    }
   }
 
   @override

@@ -1,8 +1,13 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 import '../../models/session.dart';
+import '../../models/plotline.dart';
 import '../../repositories/session_repository.dart';
+import '../../repositories/plotline_repository.dart';
+import '../../services/analysis_service.dart';
 import '../../../core/theme.dart';
-import 'package:go_router/go_router.dart';
 
 class ManualEntryScreen extends ConsumerStatefulWidget {
   final Plotline? initialPlotline;
@@ -93,17 +98,22 @@ class _ManualEntryScreenState extends ConsumerState<ManualEntryScreen> {
 
     final session = Session(
       id: const Uuid().v4(),
-      content: _contentController.text,
+      transcript: _contentController.text,
       createdAt: DateTime.now(),
       plotlineId: _selectedPlotline!.id,
       type: SessionType.manual,
     );
 
     try {
-      await ref.read(sessionRepositoryProvider).addSession(session);
+      final sessionRepo = ref.read(sessionRepositoryProvider);
+      await sessionRepo.addSession(session);
+      
+      // Trigger AI Analysis in the background
+      _triggerAnalysis(session);
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Entry saved to narrative.")),
+          const SnackBar(content: Text("Entry saved. The Biographer is reflecting...")),
         );
         context.pop();
       }
@@ -115,6 +125,28 @@ class _ManualEntryScreenState extends ConsumerState<ManualEntryScreen> {
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
+  void _triggerAnalysis(Session session) async {
+    final analysisService = ref.read(analysisServiceProvider);
+    final sessionRepo = ref.read(sessionRepositoryProvider);
+
+    final result = await analysisService.analyzeTranscript(session.transcript);
+    if (result != null) {
+      final updatedSession = Session(
+        id: session.id,
+        plotlineId: session.plotlineId,
+        createdAt: session.createdAt,
+        transcript: session.transcript,
+        title: result.title,
+        summary: result.summary,
+        moodKeyword: result.moodKeyword,
+        moodScore: result.moodScore,
+        emojis: result.emojis,
+        type: session.type,
+      );
+      await sessionRepo.addSession(updatedSession);
     }
   }
 

@@ -4,10 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'features/library/library_screen.dart';
 import 'features/library/add_plotline_screen.dart';
 import 'features/library/manual_entry_screen.dart';
+import 'features/library/plotline_detail_screen.dart';
 import 'features/onboarding/connection_studio.dart';
 import 'features/onboarding/onboarding_prologue.dart';
 import 'features/live_session/live_interview_screen.dart';
 import 'core/config_provider.dart';
+import 'models/plotline.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final config = ref.watch(configProvider);
@@ -45,11 +47,15 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/manual-entry',
-        builder: (context, state) => const ManualEntryScreen(),
+        builder: (context, state) => ManualEntryScreen(initialPlotline: state.extra as Plotline?),
+      ),
+      GoRoute(
+        path: '/plotline-detail',
+        builder: (context, state) => PlotlineDetailScreen(plotline: state.extra as Plotline),
       ),
       GoRoute(
         path: '/live-session',
-        builder: (context, state) => const LiveInterviewScreen(),
+        builder: (context, state) => LiveInterviewScreen(plotlineId: state.extra as String?),
       ),
     ],
   );
