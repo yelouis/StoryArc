@@ -10,6 +10,13 @@ final analysisServiceProvider = Provider<AnalysisService>((ref) {
   return AnalysisService(apiKey ?? '');
 });
 
+class RateLimitException implements Exception {
+  final String message;
+  RateLimitException(this.message);
+  @override
+  String toString() => message;
+}
+
 class AnalysisResult {
   final String title;
   final String summary;
@@ -41,9 +48,23 @@ class AnalysisService {
   static const String _model = 'gemini-1.5-flash';
   static const String _baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models';
 
+  // In-memory rate limiting tracking
+  static final List<DateTime> _requestTimestamps = [];
+  static const int _maxRequestsPerMinute = 5;
+
   AnalysisService(this.apiKey);
 
   Future<AnalysisResult?> analyzeTranscript(String transcript) async {
+    final now = DateTime.now();
+    // Clear timestamps older than 60 seconds
+    _requestTimestamps.removeWhere((t) => now.difference(t).inSeconds > 60);
+
+    if (_requestTimestamps.length >= _maxRequestsPerMinute) {
+      throw RateLimitException("You are reflecting too quickly. Take a deep breath.");
+    }
+
+    _requestTimestamps.add(now);
+
     if (apiKey.isEmpty) throw Exception("API Key is missing");
 
     final url = Uri.parse('$_baseUrl/$_model:generateContent?key=$apiKey');

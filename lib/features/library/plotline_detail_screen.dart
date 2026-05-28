@@ -77,7 +77,7 @@ class PlotlineDetailScreen extends ConsumerWidget {
                 return TimelineWidget(
                   sessions: sessions,
                   onSessionTap: (session) {
-                    // TODO: Show session details / full transcript
+                    context.push('/session-detail', extra: session);
                   },
                 );
               },
