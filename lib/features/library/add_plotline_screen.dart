@@ -1,6 +1,11 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/theme.dart';
+import 'package:uuid/uuid.dart';
+import '../../models/plotline.dart';
+import '../../repositories/plotline_repository.dart';
+import '../../core/theme.dart';
 
 class AddPlotlineScreen extends ConsumerStatefulWidget {
   const AddPlotlineScreen({super.key});

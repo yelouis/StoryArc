@@ -4,17 +4,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 final authServiceProvider = Provider<AuthService>((ref) => AuthService());
 
 class AuthService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth? _auth;
 
-  Stream<User?> get authStateChanges => _auth.authStateChanges();
+  AuthService({FirebaseAuth? auth}) : _auth = auth;
 
-  User? get currentUser => _auth.currentUser;
+  FirebaseAuth get auth => _auth ?? FirebaseAuth.instance;
+
+  Stream<User?> get authStateChanges => auth.authStateChanges();
+
+  User? get currentUser => auth.currentUser;
 
   Future<UserCredential> signInAnonymously() async {
-    return await _auth.signInAnonymously();
+    return await auth.signInAnonymously();
   }
 
   Future<void> signOut() async {
-    await _auth.signOut();
+    await auth.signOut();
   }
 }

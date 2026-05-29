@@ -95,7 +95,7 @@ class TimelineWidget extends StatelessWidget {
                 child: GestureDetector(
                   onTap: () => onSessionTap(session),
                   child: Padding(
-                    padding: const EdgeInsets.bottom(32),
+                    padding: const EdgeInsets.only(bottom: 32),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

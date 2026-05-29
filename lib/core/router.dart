@@ -1,17 +1,17 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'features/library/library_screen.dart';
-import 'features/library/add_plotline_screen.dart';
-import 'features/library/manual_entry_screen.dart';
-import 'features/library/plotline_detail_screen.dart';
-import 'features/library/session_detail_screen.dart';
-import 'features/onboarding/connection_studio.dart';
-import 'features/onboarding/onboarding_prologue.dart';
-import 'features/live_session/live_interview_screen.dart';
-import 'core/config_provider.dart';
-import 'models/plotline.dart';
-import 'models/session.dart';
+import '../features/library/library_screen.dart';
+import '../features/library/add_plotline_screen.dart';
+import '../features/library/manual_entry_screen.dart';
+import '../features/library/plotline_detail_screen.dart';
+import '../features/library/session_detail_screen.dart';
+import '../features/onboarding/connection_studio.dart';
+import '../features/onboarding/onboarding_prologue.dart';
+import '../features/live_session/live_interview_screen.dart';
+import 'config_provider.dart';
+import '../models/plotline.dart';
+import '../models/session.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final config = ref.watch(configProvider);

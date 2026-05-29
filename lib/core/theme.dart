@@ -5,6 +5,7 @@ class CosmicTheme {
   static const Color primaryDeepIndigo = Color(0xFF1A1B4B);
   static const Color backgroundMidnightBlack = Color(0xFF0A0A0A);
   static const Color accentElectricPurple = Color(0xFF7B2CBF);
+  static const Color accentSoftCyan = Color(0xFF00F5D4);
   static const Color glassWhite = Color(0x1AFFFFFF);
 
   static ThemeData get darkTheme {

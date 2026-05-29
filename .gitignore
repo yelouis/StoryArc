@@ -58,3 +58,15 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# IDE and Tools
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.history/
+
+# Logs and Databases
+*.log
+*.sqlite

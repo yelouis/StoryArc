@@ -65,6 +65,10 @@ Transform raw session transcripts into meaningful narrative data and visualize t
    - **Root Cause**: Generic AI summaries were breaking the premium, cinematic immersion of the StoryArc experience.
    - **Implementation**: Refined the `AnalysisService` system instructions to enforce a "Narrative Engine" persona, requesting "punchy" titles and descriptive, cinematic summaries.
 
+4. **Timeline Widget Layout Constructor Mismatch (Finalized - May 28)**:
+   - **Root Cause**: The `TimelineWidget` implementation attempted to use the non-existent `EdgeInsets.bottom(32)` constructor. In Flutter, layout paddings targeting single dimensions must use `EdgeInsets.only(...)`, resulting in a compilation error that blocked app execution and testing.
+   - **Implementation**: Replaced `EdgeInsets.bottom(32)` with `EdgeInsets.only(bottom: 32)` in the timeline session node container layout.
+
 ## 🎬 Active Limitations & Narrative Backlog
 
 - **Markdown-Wrapped JSON**: Gemini occasionally wraps the JSON response in markdown blocks (```json ... ```) despite strict instructions, causing parsing errors. Implementing a regex-based JSON extractor in `AnalysisService` is suggested.

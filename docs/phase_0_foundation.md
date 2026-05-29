@@ -113,6 +113,10 @@ Establish the architectural foundation of the Story Arc Flutter application, inc
    - **Root Cause**: A premium app requires a consistent design system and a high-friction-reducing onboarding flow.
    - **Implementation**: Developed a suite of `ArcWidgets` (frosted glass components) and a cinematic `OnboardingPrologue` to introduce users to the "Plotline" concept before requesting API credentials.
 
+6. **Firebase Repository and Stream Mock Test Decoupling (Finalized - May 28)**:
+   - **Root Cause**: Core repositories (`SessionRepository`, `PlotlineRepository`) and services (`AuthService`) initialized static instances like `FirebaseFirestore.instance` inline during field declaration. This evaluated calls to uninitialized native platform channels during widget tests, throwing `MissingPluginException` and crashing the test framework. Additionally, mock repository streams using simple broadcast controllers did not replay the latest value when GoRouter recreated the routes and re-subscribed, leaving page content in a permanent `CircularProgressIndicator` state.
+   - **Implementation**: Refactored repositories and service constructors to accept optional injected dependencies, retrieving standard static instances via dynamic getters only during database calls. Rewrote the E2E test repositories to return streams using Dart's asynchronous generators (`async*`), yielding the current list immediately upon subscription to resolve rebuild loading delays.
+
 ## 🎬 Active Limitations & Narrative Backlog
 
 - **Firestore Collection Scaling**: Currently, large datasets are handled via standard listeners. Moving to a paginated fetching strategy for the `Timeline` is suggested before Phase 1 completion.

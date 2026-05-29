@@ -62,6 +62,10 @@ Implement the core multimodal interaction: a real-time voice interview with Gemi
    - **Root Cause**: Static UIs fail to convey the "listening" state of the AI, leading to user confusion and reduced immersion.
    - **Implementation**: Developed a `CustomPainter` that consumes a high-frequency amplitude stream (50ms intervals) to drive a multi-layered wave animation, providing immediate visual confirmation of audio capture.
 
+4. **FlutterPcmSound API Mismatch and Parameter Alignment (Finalized - May 28)**:
+   - **Root Cause**: The project was configured with `flutter_pcm_sound: ^1.0.3`. The library's `setup` method expects a `channelCount` parameter rather than `channels`, and the `feed` method requires wrapping the raw audio bytes buffer in a `PcmArrayInt16` object rather than passing a raw `Uint8List`. This caused compilation failures and runtime errors during live voice session playback initialization.
+   - **Implementation**: Updated the `AudioService` configuration calls: changed `channels: 1` to `channelCount: 1` in `FlutterPcmSound.setup` and wrapped the `Uint8List` chunk in a `PcmArrayInt16` in `FlutterPcmSound.feed`.
+
 ## 🎬 Active Limitations & Narrative Backlog
 
 - **Audio Buffer Underflow**: On unstable connections, AI voice playback can stutter. Implementing a jitter buffer in the `AudioService` is suggested.

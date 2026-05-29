@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/plotline.dart';
-import '../onboarding/auth_service.dart';
+import '../features/onboarding/auth_service.dart';
 
 final plotlineRepositoryProvider = Provider<PlotlineRepository>((ref) {
   final authService = ref.watch(authServiceProvider);
@@ -10,14 +10,17 @@ final plotlineRepositoryProvider = Provider<PlotlineRepository>((ref) {
 
 class PlotlineRepository {
   final AuthService _authService;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore? _firestore;
 
-  PlotlineRepository(this._authService);
+  PlotlineRepository(this._authService, {FirebaseFirestore? firestore})
+      : _firestore = firestore;
+
+  FirebaseFirestore get firestore => _firestore ?? FirebaseFirestore.instance;
 
   CollectionReference get _plotlinesCollection {
     final uid = _authService.currentUser?.uid;
     if (uid == null) throw Exception('User not authenticated');
-    return _firestore.collection('users').doc(uid).collection('plotlines');
+    return firestore.collection('users').doc(uid).collection('plotlines');
   }
 
   Stream<List<Plotline>> getPlotlines() {

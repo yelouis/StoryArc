@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../repositories/plotline_repository.dart';
 import 'widgets/plotline_card.dart';
 import '../../../core/theme.dart';

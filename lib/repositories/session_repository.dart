@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/session.dart';
-import '../onboarding/auth_service.dart';
+import '../features/onboarding/auth_service.dart';
 
 final sessionRepositoryProvider = Provider<SessionRepository>((ref) {
   final authService = ref.watch(authServiceProvider);
@@ -10,14 +10,17 @@ final sessionRepositoryProvider = Provider<SessionRepository>((ref) {
 
 class SessionRepository {
   final AuthService _authService;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore? _firestore;
 
-  SessionRepository(this._authService);
+  SessionRepository(this._authService, {FirebaseFirestore? firestore})
+      : _firestore = firestore;
+
+  FirebaseFirestore get firestore => _firestore ?? FirebaseFirestore.instance;
 
   CollectionReference _sessionsCollection(String plotlineId) {
     final uid = _authService.currentUser?.uid;
     if (uid == null) throw Exception('User not authenticated');
-    return _firestore
+    return firestore
         .collection('users')
         .doc(uid)
         .collection('plotlines')
@@ -40,7 +43,7 @@ class SessionRepository {
     // Update the lastActive timestamp on the plotline
     final uid = _authService.currentUser?.uid;
     if (uid != null) {
-      await _firestore
+      await firestore
           .collection('users')
           .doc(uid)
           .collection('plotlines')

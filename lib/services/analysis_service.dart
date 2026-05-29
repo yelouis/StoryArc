@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../core/config_provider.dart';
-import '../models/session.dart';
 
 final analysisServiceProvider = Provider<AnalysisService>((ref) {
   final apiKey = ref.watch(configProvider).geminiApiKey;
@@ -107,7 +106,7 @@ Return ONLY the JSON object. No markdown, no preamble.
         final text = data['candidates'][0]['content']['parts'][0]['text'];
         
         // Use compute to parse JSON in a background isolate to prevent UI jank
-        return await compute(_parseAnalysisResult, text);
+        return await compute(_parseAnalysisResult, text as String);
       } else {
         print("Analysis Error: ${response.statusCode} - ${response.body}");
         return null;

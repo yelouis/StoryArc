@@ -542,7 +542,7 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
           ),
           if (_isAnalyzing)
             Container(
-              color: Colors.black70,
+              color: Colors.black.withOpacity(0.7),
               child: Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,

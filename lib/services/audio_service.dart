@@ -54,12 +54,12 @@ class AudioService {
   }
 
   Future<void> initPlayback() async {
-    await FlutterPcmSound.setup(sampleRate: 16000, channels: 1);
+    await FlutterPcmSound.setup(sampleRate: 16000, channelCount: 1);
   }
 
   Future<void> playAudioChunk(Uint8List chunk) async {
-    // Gemini returns 16-bit PCM. flutter_pcm_sound expects Int16List or Uint8List depending on version.
-    await FlutterPcmSound.feed(chunk);
+    // Gemini returns 16-bit PCM. feed expects PcmArrayInt16
+    await FlutterPcmSound.feed(PcmArrayInt16(bytes: chunk.buffer.asByteData()));
   }
 
   void dispose() {

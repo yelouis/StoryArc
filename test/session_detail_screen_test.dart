@@ -6,17 +6,24 @@ import 'package:story_arc/models/session.dart';
 import 'package:story_arc/repositories/session_repository.dart';
 import 'package:story_arc/services/analysis_service.dart';
 
-// Fakes & Mocks
-class FakeUser {}
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:story_arc/features/onboarding/auth_service.dart';
 
-class FakeAuthService {
-  dynamic get currentUser => FakeUser();
+// Fakes & Mocks
+class FakeUser extends Fake implements User {
+  @override
+  String get uid => 'user_123';
+}
+
+class FakeAuthService extends Fake implements AuthService {
+  @override
+  User? get currentUser => FakeUser();
 }
 
 class MockSessionRepository extends SessionRepository {
   final List<Session> sessions = [];
 
-  MockSessionRepository() : super(FakeAuthService() as dynamic);
+  MockSessionRepository() : super(FakeAuthService());
 
   @override
   Stream<List<Session>> getSessions(String plotlineId) {
@@ -35,6 +42,7 @@ class MockAnalysisService extends AnalysisService {
 
   @override
   Future<AnalysisResult?> analyzeTranscript(String transcript) async {
+    await Future.delayed(const Duration(milliseconds: 10));
     return AnalysisResult(
       title: 'Mock AI Title',
       summary: 'Mock AI Summary',
@@ -122,6 +130,7 @@ void main() {
       // Verify cinematic loading text shows
       expect(find.text('Narrative Engine weaving your story...'), findsOneWidget);
 
+      await tester.pump(const Duration(milliseconds: 20)); // wait for delay
       await tester.pumpAndSettle(); // Complete async action
 
       // Verify loading text goes away
