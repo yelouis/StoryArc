@@ -135,6 +135,7 @@ class _LiveInterviewScreenState extends ConsumerState<LiveInterviewScreen> {
   }
 
   void _showEmojiStudio(Session session) {
+    bool completed = false;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -142,13 +143,14 @@ class _LiveInterviewScreenState extends ConsumerState<LiveInterviewScreen> {
       builder: (context) => EmojiStudioWidget(
         session: session,
         onComplete: () {
+          completed = true;
           Navigator.pop(context); // Close bottom sheet
           if (mounted) Navigator.pop(this.context); // Exit LiveInterviewScreen
         },
       ),
     ).then((_) {
       // If they dismissed the bottom sheet without picking, just pop the screen
-      if (mounted && _analyzedSession != null) {
+      if (mounted && !completed && _analyzedSession != null) {
         Navigator.pop(context);
       }
     });

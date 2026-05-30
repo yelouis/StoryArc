@@ -75,6 +75,21 @@ class GeminiLiveService {
       // Handle Server Content
       if (data['serverContent'] != null) {
         final serverContent = data['serverContent'];
+
+        // Handle User Content (transcribed user turns returned by the server)
+        final userContent = serverContent['userContent'] ?? 
+                            serverContent['clientContent'] ?? 
+                            serverContent['userTurn'] ?? 
+                            serverContent['clientTurn'];
+        if (userContent != null && userContent['parts'] != null) {
+          for (var part in userContent['parts']) {
+            if (part['text'] != null) {
+              final text = part['text'];
+              _transcriptParts.add("User: $text");
+            }
+          }
+        }
+
         if (serverContent['modelTurn'] != null) {
           final parts = serverContent['modelTurn']['parts'];
           for (var part in parts) {

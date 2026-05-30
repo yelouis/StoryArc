@@ -81,10 +81,26 @@ Build the primary user interface and CRUD functionality for managing Plotlines a
 
 ## 🎬 Active Limitations & Narrative Backlog
 
+### Issue 1: Missing Plotline Gradient/Color Customization
+**Status**: ⚠️ Confirmed Unresolved — Verified in [plotline.dart](file:///Users/louisye/Desktop/Louis%20Y./StoryArc/lib/models/plotline.dart#L5-L24) and [add_plotline_screen.dart](file:///Users/louisye/Desktop/Louis%20Y./StoryArc/lib/features/library/add_plotline_screen.dart#L59-L136): the model and UI lack fields/inputs for configuring background gradients or colors, preventing users from selecting gradients (such as the deep purple gradient described in the user journey).
+
+**Option A (recommended)**: **Dynamic Gradient Schema and Selection** — Extend the `Plotline` model with a `gradientIndex` or `gradientName` property, update Firestore serialization, and implement a horizontal scrollable gradient selector in the "New Narrative" screen.
+  - *Pros*: Completely aligns with the Sarah Chen user journey; allows customizable, rich visual differentiation on the library screen.
+  - *Cons*: Requires minor database schema update and model deserialization migration.
+
+**Option B**: **Emoji-Based Automated Gradients** — Map specific hero emojis to pre-selected gradients dynamically in the frontend (e.g., `🚀` automatically resolves to a deep purple gradient).
+  - *Pros*: Requires zero database schema changes or UI additions to the creation screen.
+  - *Cons*: Eliminates manual user agency; restricts visual styling combinations.
+
+Your selection: _____
+
+---
+
 - **Emoji Picker Performance**: The standard `emoji_picker_flutter` can cause minor frame drops during the first load. Investigating pre-caching or native picker alternatives for Phase 2.
 - **Advanced Conflict Resolution**: Firestore handles basic offline sync, but concurrent edits on multiple devices for the same entry are not yet handled with a specific merge strategy.
 - **Rich Text Support**: Manual entries are currently plain text. Implementing a Markdown or Delta-based rich text editor is suggested for Phase 2.
 - **Draft Recovery**: While local state holds the current entry, a crash during editing would result in data loss. Implementing an `Isar`-based local draft cache is suggested.
+
 
 
 

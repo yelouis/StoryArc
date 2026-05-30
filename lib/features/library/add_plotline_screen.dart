@@ -17,6 +17,7 @@ class AddPlotlineScreen extends ConsumerStatefulWidget {
 class _AddPlotlineScreenState extends ConsumerState<AddPlotlineScreen> {
   final _titleController = TextEditingController();
   String _selectedEmoji = "📖";
+  String _selectedGradient = "Deep Purple";
   bool _showEmojiPicker = false;
 
   void _savePlotline() async {
@@ -28,6 +29,7 @@ class _AddPlotlineScreenState extends ConsumerState<AddPlotlineScreen> {
       emoji: _selectedEmoji,
       createdAt: DateTime.now(),
       lastActive: DateTime.now(),
+      gradientName: _selectedGradient,
     );
 
     try {
@@ -88,7 +90,58 @@ class _AddPlotlineScreenState extends ConsumerState<AddPlotlineScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 32),
+                  const Text(
+                    "Select a color palette",
+                    style: TextStyle(fontSize: 18, color: Colors.white70),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    height: 50,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: CosmicTheme.gradients.entries.map((entry) {
+                        final name = entry.key;
+                        final colors = entry.value;
+                        final isSelected = _selectedGradient == name;
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _selectedGradient = name;
+                            });
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            margin: const EdgeInsets.only(right: 16),
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: colors,
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: isSelected ? Colors.white : Colors.transparent,
+                                width: 2,
+                              ),
+                              boxShadow: isSelected
+                                  ? [
+                                      BoxShadow(
+                                        color: colors.first.withOpacity(0.5),
+                                        blurRadius: 8,
+                                        spreadRadius: 2,
+                                      )
+                                    ]
+                                  : null,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
                   const Text(
                     "Pick a symbolic anchor",
                     style: TextStyle(fontSize: 18, color: Colors.white70),

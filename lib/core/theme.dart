@@ -8,6 +8,14 @@ class CosmicTheme {
   static const Color accentSoftCyan = Color(0xFF00F5D4);
   static const Color glassWhite = Color(0x1AFFFFFF);
 
+  static const Map<String, List<Color>> gradients = {
+    'Deep Purple': [Color(0xFF3A0CA3), Color(0xFF7209B7)],
+    'Cosmic Blue': [Color(0xFF03045E), Color(0xFF0077B6)],
+    'Sunset Orange': [Color(0xFFE85D04), Color(0xFFD00000)],
+    'Forest Green': [Color(0xFF132A13), Color(0xFF3F5E3D)],
+    'Electric Teal': [Color(0xFF005F73), Color(0xFF0A9396)],
+  };
+
   static ThemeData get darkTheme {
     return ThemeData(
       brightness: Brightness.dark,

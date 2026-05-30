@@ -18,13 +18,21 @@ class PlotlineCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = CosmicTheme.gradients[plotline.gradientName] ?? CosmicTheme.gradients['Deep Purple']!;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: CosmicTheme.glassWhite,
+          gradient: LinearGradient(
+            colors: [
+              colors[0].withOpacity(0.15),
+              colors[1].withOpacity(0.05),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: Colors.white.withOpacity(0.1)),
         ),
@@ -34,7 +42,11 @@ class PlotlineCard extends StatelessWidget {
               width: 60,
               height: 60,
               decoration: BoxDecoration(
-                color: CosmicTheme.accentElectricPurple.withOpacity(0.2),
+                gradient: LinearGradient(
+                  colors: colors,
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
                 borderRadius: BorderRadius.circular(15),
               ),
               child: Center(

@@ -68,9 +68,40 @@ Implement the core multimodal interaction: a real-time voice interview with Gemi
 
 ## 🎬 Active Limitations & Narrative Backlog
 
+### Issue 1: Double-Pop Navigation Bug after Voice Session
+**Status**: ⚠️ Confirmed Unresolved — Verified in [live_interview_screen.dart](file:///Users/louisye/Desktop/Louis%20Y./StoryArc/lib/features/live_session/live_interview_screen.dart#L137-L155): the `.then` callback of `showModalBottomSheet` triggers `Navigator.pop(context)` if `_analyzedSession != null`, which causes a second pop if the sheet was already closed via the `onComplete` callback, navigating the user back to the Library Screen instead of the Plotline details timeline.
+
+**Option A (recommended)**: **Local State Completion Flag** — Introduce a local boolean flag `completed` in `_showEmojiStudio`. Set it to true in the `onComplete` callback and check `!completed` in the `.then` block before executing a pop.
+  - *Pros*: Correctly preserves navigation stack; resolves navigation jumps cleanly.
+  - *Cons*: Adds minor state-tracking variable within the dialog trigger context.
+
+**Option B**: **Unified Modal Dismissal Navigation** — Only call `Navigator.pop(context)` (to close the bottom sheet) inside `onComplete`, and delegate the screen pop entirely to the `.then` handler, so only one pop is executed on the main screen context.
+  - *Pros*: Simplifies popping logic; single responsibility for popping the parent screen.
+  - *Cons*: May cause issues if different transitions are needed for success vs cancellation.
+
+Your selection: Proceed with Option A.
+
+---
+
+### Issue 2: Missing User Turn Transcription in Live Session
+**Status**: ⚠️ Confirmed Unresolved — Verified in [gemini_live_service.dart](file:///Users/louisye/Desktop/Louis%20Y./StoryArc/lib/services/gemini_live_service.dart#L71-L98): the WebSocket message handler only appends AI model turns (`Biographer: ...`) to the conversation transcript, omitting the user's spoken contributions entirely and leading the analysis engine to analyze only the therapist's questions.
+
+**Option A (recommended)**: **Multimodal Server Turn Tracking** — Update `_handleMessage` to parse the user's turn data returned by the Gemini Multimodal Live API server, or utilize a client-side speech-to-text package to transcribe and append user utterances in real-time.
+  - *Pros*: Creates a complete transcript of the conversation, resulting in accurate post-session summary and sentiment mapping.
+  - *Cons*: Adds complexity to WebSocket message parsing or increases resource overhead by running client-side speech recognition.
+
+**Option B**: **Summarized Session Flow** — Send raw audio or use a separate quick audio-transcription API call upon ending the session to retrieve the full user monologue.
+  - *Pros*: Keeps the real-time WebSocket communication simpler.
+  - *Cons*: Introduces additional API network delay at the end of the session.
+
+Your selection: Proceed with Option A.
+
+---
+
 - **Audio Buffer Underflow**: On unstable connections, AI voice playback can stutter. Implementing a jitter buffer in the `AudioService` is suggested.
 - **Echo Cancellation**: Standard Flutter audio recording may capture the speaker's output on some devices. Moving to `flutter_webrtc` for hardware-level AEC is suggested for Phase 3.
 - **Voice Activity Detection (VAD)**: The current implementation streams silence to Gemini. Implementing client-side VAD to pause the stream when the user is not speaking is suggested for token optimization.
 - **Session Continuity**: WebSocket drops cause a loss of conversation state. Persisting the current session transcript to Firestore in real-time for seamless reconnection is suggested.
+
 
 

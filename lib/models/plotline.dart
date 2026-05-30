@@ -11,6 +11,7 @@ class Plotline {
   final bool isPinned;
   final DateTime createdAt;
   final DateTime lastActive;
+  final String gradientName;
 
   Plotline({
     required this.id,
@@ -21,6 +22,7 @@ class Plotline {
     this.isPinned = false,
     required this.createdAt,
     required this.lastActive,
+    this.gradientName = 'Deep Purple',
   });
 
   Map<String, dynamic> toMap() {
@@ -33,6 +35,7 @@ class Plotline {
       'isPinned': isPinned,
       'createdAt': Timestamp.fromDate(createdAt),
       'lastActive': Timestamp.fromDate(lastActive),
+      'gradientName': gradientName,
     };
   }
 
@@ -49,6 +52,7 @@ class Plotline {
       isPinned: map['isPinned'] ?? false,
       createdAt: (map['createdAt'] as Timestamp).toDate(),
       lastActive: (map['lastActive'] as Timestamp).toDate(),
+      gradientName: map['gradientName'] ?? 'Deep Purple',
     );
   }
 }

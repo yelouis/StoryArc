@@ -448,13 +448,8 @@ void main() {
       // Sarah rejects high anxiety suggestions and taps '🧗' (struggling climb)
       await tester.tap(find.text("🧗"));
       await pumpTransition(tester);
-
-      // Defensively check if we popped back to Library screen, and navigate back to details if needed
-      final currentLoc = container.read(routerProvider).routerDelegate.currentConfiguration.uri.toString();
-      if (currentLoc == '/') {
-        await tester.tap(find.text("Product Launch 2026"));
-        await pumpTransition(tester);
-      }
+      // Verify that we are on the plotline detail screen after popping
+      expect(find.text("Your Plotlines"), findsNothing);
 
       // 9. Back on timeline, verify the node displays with selected emoji and title
       expect(find.text("Summit Friction"), findsOneWidget);
@@ -510,12 +505,8 @@ void main() {
       await tester.tap(find.text("🌳"));
       await pumpTransition(tester);
 
-      // Defensively check if we popped back to Library screen, and navigate back to details if needed
-      final currentLoc = container.read(routerProvider).routerDelegate.currentConfiguration.uri.toString();
-      if (currentLoc == '/') {
-        await tester.tap(find.text("Fantasy Novel WIP"));
-        await pumpTransition(tester);
-      }
+      // Verify that we are on the plotline detail screen after popping
+      expect(find.text("Your Plotlines"), findsNothing);
 
       // 4. Back on Plotline detail screen, open the newly created session
       expect(find.text("obsidian key under the willow"), findsOneWidget);

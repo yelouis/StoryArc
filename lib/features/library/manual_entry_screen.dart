@@ -153,6 +153,7 @@ class _ManualEntryScreenState extends ConsumerState<ManualEntryScreen> {
   }
 
   void _showEmojiStudio(Session session) {
+    bool completed = false;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -160,12 +161,15 @@ class _ManualEntryScreenState extends ConsumerState<ManualEntryScreen> {
       builder: (context) => EmojiStudioWidget(
         session: session,
         onComplete: () {
+          completed = true;
           Navigator.pop(context); // Close bottom sheet
           if (mounted) Navigator.pop(this.context); // Exit ManualEntryScreen
         },
       ),
     ).then((_) {
-      if (mounted) Navigator.pop(context);
+      if (mounted && !completed) {
+        Navigator.pop(context);
+      }
     });
   }
 
