@@ -70,3 +70,9 @@ Temporary Items
 # Logs and Databases
 *.log
 *.sqlite
+
+# Temporary Platform Folders and Generated Files
+macos/
+web/
+analysis_options.yaml
+test/widget_test.dart
